@@ -28,3 +28,118 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tibble)
+library(ggrepel)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+parent_octa <- read.csv('~/R/Figures_for_F31/parental-octa-sorted-by-rank.csv')
+numbers <- read.csv('~/R/Figures_for_F31/Numbers.csv')
+head(parent_octa)
+head(numbers)
+```
+
+```{r}
+dim(parent_octa)
+```
+```{r}
+#head(parent_octa)
+parent_octa_minus_nontarget <- parent_octa %>%
+  filter(!grepl('Non-Targeting', Gene))
+parent_octa_minus_nontarget$Values <- numbers$Values
+dim(parent_octa_minus_nontarget)
+parent_octa_minus_nontarget["1299", "Gene"] <- "SPT4"
+glimpse(parent_octa_minus_nontarget)
+```
+
+
+
+```{r}
+CRISPR_hits <- ggplot2::ggplot(parent_octa, aes(x=Values, y=Diff)) +
+  geom_point() +
+  theme_bw() +
+  labs(x="Genes") +
+  geom_text_repel(
+    data = subset(parent_octa, Gene == "MYC" | Gene == "BRD4" | Gene == "SUPT4H1"),
+    aes(label=Gene))
+
+CRISPR_hits
+
+#    parent_octa %>%
+ #     filter(Gene = BRD4),
+  #    aes(label=Gene)
+```
+```{r}
+CRISPR_hits2 <- ggplot2::ggplot(parent_octa, aes(x=Values, y=Diff)) +
+  geom_point(col = ifelse(parent_octa$Values == 1447, "Red", "Black")) + 
+  theme_bw() +
+  labs(x="Genes") +
+  geom_text_repel(
+    data = subset(parent_octa, Gene == "MYC" | Gene == "BRD4" | Gene == "SUPT4H1"),
+    aes(label=Gene, color = "Red"))
+
+CRISPR_hits2
+```
+
+#| ifelse(parent_octa$Values == 1447, "Red", "Black")
+
+```{r}
+genes_of_interest_df <- parent_octa_minus_nontarget %>%
+  filter(Gene == "BRD4" | Gene == "MYC" | Gene == "SPT4")
+#genes_of_interest_df
+final_chart <- parent_octa_minus_nontarget %>%
+  ggplot2::ggplot(aes(x=Values, y=Diff)) +
+  geom_point() + 
+  theme_classic() +
+  geom_point(data = genes_of_interest_df,
+             aes(x=Values, y=Diff),
+             color = "Red") +
+  labs(x="Genes") +
+  geom_text_repel(data = genes_of_interest_df, size=4, show.legend = FALSE,
+            aes(label=Gene, color = "Red", hjust = 2.5))
+final_chart
+    #data = subset(parent_octa, Gene == "MYC" | Gene == "BRD4" | Gene == "SUPT4H1"),
+    #aes(label=Gene, color = "Red"))
+```
+#cex to change size of points
+
+
+```{r}
+CRISPR_hits_color <- ggplot2::ggplot(parent_octa, aes(x=Values, y=Diff, col = ifelse(Gene == "BRD4", color = "red", "black"))) +
+  geom_point() +
+  labs(x="Genes") +
+  geom_text_repel(
+    data = subset(parent_octa, Gene == "MYC" | Gene == "BRD4" | Gene == "SUPT4H1"),
+    aes(label=Gene))
+CRISPR_hits_color
+```
+```{r}
+ggplot(parent_octa, aes(Values, Diff)) +
+  geom_point(col = ifelse(parent_octa$Gene == "BRD4", "red", "black", cex = ifelse(parent_octa$Gene == "BRD4", 5, 1)))
+```
+
+
+```{r}
+
+CRISPR_hits_color2 <- ggplot2::ggplot(parent_octa, aes(x=Values, y=Diff)) +
+  geom_point() +
+  theme_bw() +
+  labs(x="Genes") +
+  geom_text_repel(
+    data = subset(parent_octa, Gene == "MYC" | Gene == "BRD4" | Gene == "SUPT4H1"),
+    aes(label=Gene))
+
+  
+```
+
+
