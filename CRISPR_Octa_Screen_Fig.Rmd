@@ -43,8 +43,8 @@ library(ggrepel)
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 ```{r}
-parent_octa <- read.csv('~/R/Figures_for_F31/parental-octa-sorted-by-rank.csv')
-numbers <- read.csv('~/R/Figures_for_F31/Numbers.csv')
+parent_octa <- read.csv('~/R/Figures_F31/parental-octa-sorted-by-rank.csv')
+numbers <- read.csv('~/R/Figures_F31/Numbers.csv')
 head(parent_octa)
 head(numbers)
 ```
@@ -52,6 +52,7 @@ head(numbers)
 ```{r}
 dim(parent_octa)
 ```
+
 ```{r}
 #head(parent_octa)
 parent_octa_minus_nontarget <- parent_octa %>%
@@ -79,6 +80,8 @@ CRISPR_hits
  #     filter(Gene = BRD4),
   #    aes(label=Gene)
 ```
+
+
 ```{r}
 CRISPR_hits2 <- ggplot2::ggplot(parent_octa, aes(x=Values, y=Diff)) +
   geom_point(col = ifelse(parent_octa$Values == 1447, "Red", "Black")) + 
@@ -92,6 +95,8 @@ CRISPR_hits2
 ```
 
 #| ifelse(parent_octa$Values == 1447, "Red", "Black")
+
+#Below is the good chart I used for showing positive hits only.
 
 ```{r}
 genes_of_interest_df <- parent_octa_minus_nontarget %>%
@@ -111,6 +116,37 @@ final_chart
     #data = subset(parent_octa, Gene == "MYC" | Gene == "BRD4" | Gene == "SUPT4H1"),
     #aes(label=Gene, color = "Red"))
 ```
+
+#Adding CI Hits
+```{r}
+library(stringr)
+CI_genes_of_interest_df <- parent_octa_minus_nontarget %>%
+  filter((str_detect(Gene, "NDUF") | Gene == "COX6A1") & Diff < -1.2)
+CI_genes_of_interest_df
+
+
+final_chart_double <- parent_octa_minus_nontarget %>%
+  ggplot2::ggplot(aes(x=Values, y=Diff)) +
+  geom_point() + 
+  theme_classic() +
+  geom_point(data = genes_of_interest_df,
+             aes(x=Values, y=Diff),
+             color = "Red") +
+  labs(x="Genes") +
+  geom_point(data = CI_genes_of_interest_df,
+             aes(x=Values, y=Diff),
+             color = "deepskyblue") +
+  geom_text_repel(data = genes_of_interest_df, size=4, show.legend = FALSE,
+            aes(label=Gene, color = "deepskyblue", hjust = 2.5)) +
+  geom_text_repel(data = CI_genes_of_interest_df, size=4, show.legend = FALSE,
+            aes(label=Gene, color = "Red", hjust = 2.5))
+final_chart_double
+    #data = subset(parent_octa, Gene == "MYC" | Gene == "BRD4" | Gene == "SUPT4H1"),
+    #aes(label=Gene, color = "Red"))
+```
+
+
+
 #cex to change size of points
 
 
